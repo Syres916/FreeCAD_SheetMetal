@@ -39,7 +39,10 @@ icons_path = os.path.join(mod_path, "Resources", "icons")
 panels_path = os.path.join(mod_path, "Resources", "panels")
 language_path = os.path.join(mod_path, "translations")
 params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/SheetMetal")
-smEpsilon = FreeCAD.Base.Precision.approximation()
+if hasattr(FreeCAD.Base, "Precision"):
+    smEpsilon = FreeCAD.Base.Precision.approximation()
+else:
+    smEpsilon = Part.Precision.approximation()
 smForceRecompute = False
 smObjectsToRecompute = set()
 translatedPreviewText = translate("SheetMetalTools", "Preview")
@@ -56,7 +59,10 @@ def isGuiLoaded():
     
 if isGuiLoaded():
     from PySide import QtCore, QtGui
-    from PySide.QtWidgets import QHeaderView
+    if hasattr(QtGui, "QHeaderView"):
+        from PySide.QtGui import QHeaderView
+    else:
+        from PySide.QtWidgets import QHeaderView
     from FreeCAD import Gui
 
     def smWarnDialog(msg):
@@ -448,7 +454,10 @@ if isGuiLoaded():
     def taskConnectSpin(obj, formvar, propName, callback = None, bindFunction = True):
         formvar.setProperty("value", _getVarValue(obj, propName))
         if bindFunction:
-            Gui.ExpressionBinding(formvar).bind(obj, propName)
+            try:
+                Gui.ExpressionBinding(formvar).bind(obj, "KFactor")
+            except:
+                FreeCAD.Console.PrintLog("Skipping bindFunction\n")
         # keyboardTracking is set to False to avoid recompute on every key press
         formvar.setProperty("keyboardTracking",False)
         formvar.valueChanged.connect(lambda value: _taskUpdateValue(value, obj, propName, callback))
