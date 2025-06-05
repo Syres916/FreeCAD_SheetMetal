@@ -34,6 +34,10 @@ import Part
 import SheetMetalTools
 from FreeCAD import Matrix, Placement, Rotation, Vector
 from TechDraw import projectEx as project_shape_to_plane
+if hasattr(FreeCAD.Base, "Precision"):
+    fc_precision = FreeCAD.Base.Precision
+else:
+    fc_precision = Part.Precision # 0.20.x and below
 
 try:
     import networkx as nx
@@ -60,15 +64,15 @@ except AttributeError:
 # This is intentionally larger than OCC's tolerance requirements,
 # so that out of tolerance geometry can still be processed
 # and then fixed later with cleanup passes
-eps = FreeCAD.Base.Precision.approximation()
+eps = fc_precision.approximation()
 # this is used instead of 'eps' when comparing angles
-eps_angular = FreeCAD.Base.Precision.angular()
+eps_angular = fc_precision.angular()
 # when running cleanup passes, it will be assumed that points that are
 # closer together than this value should be altered to be exactly coincident
 fuzz = 1e-3  # <-- 1 / 1000 * 1mm  = one micrometer
 # this is OCC's upper bound for tolerance errors when building geometry.
 # Make sure to use it as an acceptance criterion before passing data to OCC!
-tol = FreeCAD.Base.Precision.confusion()
+tol = fc_precision.confusion()
 # When converting B-Splines to Arcs, use a much larger tolerance value,
 # so that we don't end up with too many small segments
 spline2arc_tol = 0.1  # one tenth of one millimeter
