@@ -455,7 +455,7 @@ if isGuiLoaded():
         formvar.setProperty("value", _getVarValue(obj, propName))
         if bindFunction:
             try:
-                Gui.ExpressionBinding(formvar).bind(obj, "KFactor")
+                Gui.ExpressionBinding(formvar).bind(obj, propName)
             except:
                 FreeCAD.Console.PrintLog("Skipping bindFunction\n")
         # keyboardTracking is set to False to avoid recompute on every key press
